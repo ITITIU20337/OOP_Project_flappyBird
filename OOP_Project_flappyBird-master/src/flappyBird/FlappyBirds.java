@@ -1,5 +1,3 @@
-
-
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
@@ -13,8 +11,13 @@ import pkg2dgamesframework.GameScreen;
 public class FlappyBirds extends GameScreen {
     private BufferedImage birds;
     private Animation bird_anim;
+    
     public static float g = 0.1F;
+    
     private Bird bird;
+    private Ground ground;
+    private ChimneyGroup chimneyGroup;
+    
     private int Point = 0;
     private int BEGIN_SCREEN = 0;
     private int GAMEPLAY_SCREEN = 1;
@@ -39,7 +42,11 @@ public class FlappyBirds extends GameScreen {
         this.bird_anim.AddFrame(f);
         f = new AFrameOnImage(60, 0, 60, 60);
         this.bird_anim.AddFrame(f);
+        
         this.bird = new Bird(350, 250, 50, 50);
+        ground = new Ground();
+        chimneyGroup = new ChimneyGroup();
+        
         this.BeginGame();
     }
 
@@ -48,18 +55,50 @@ public class FlappyBirds extends GameScreen {
     }
 
     private void resetGame() {
-
+        bird.setPos(350, 250);
+        bird.setVt(0);
+        bird.setLive(true);
+        Point = 0;
+        chimneyGroup.resetChimneys();
     }
-
+    @Override
     public void GAME_UPDATE(long deltaTime) {
-
+        if(CurrentScreen == BEGIN_SCREEN){
+            resetGame();
+        }else if(CurrentScreen == GAMEPLAY_SCREEN){
+            
+            if(bird.getLive()) bird_anim.Update_Me(deltaTime);
+            bird.update(deltaTime);
+            ground.Update();
+            
+            chimneyGroup.update();
+            
+            for(int i = 0;i<ChimneyGroup.SIZE;i++){
+                if(bird.getRect().intersects(chimneyGroup.getChimney(i).getRect())){
+                    bird.setLive(false);
+                    System.out.println("Set live = false");
+                }
+                    
+                
+            }
+            
+            for(int i = 0;i<ChimneyGroup.SIZE;i++){
+                if(bird.getPosX() > chimneyGroup.getChimney(i).getPosX() && !chimneyGroup.getChimney(i).getIsBehindBird()
+                        && i%2==0){
+                    Point ++;
+                    chimneyGroup.getChimney(i).setIsBehindBird(true);
+                }
+                    
+            }
+            
+            if(bird.getPosY() + bird.getH() > ground.getYGround()) CurrentScreen = GAMEOVER_SCREEN;
+            
+        }else{
+            
+        }
     }
 
     @Override
-    public void GAME_PAINT(Graphics2D g2) {
-
-    }
-
     public void GAME_PAINT(Graphics g2) {
 
     }
