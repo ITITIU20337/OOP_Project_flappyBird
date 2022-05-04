@@ -100,11 +100,51 @@ public class FlappyBirds extends GameScreen {
 
     @Override
     public void GAME_PAINT(Graphics g2) {
-
+        g2.setColor(Color.decode("#b8daef"));
+        g2.fillRect(0, 0, MASTER_WIDTH, MASTER_HEIGHT);
+        
+        chimneyGroup.paint(g2);
+        
+        ground.Paint(g2);
+        
+        
+        
+        if(bird.getIsFlying())
+            bird_anim.PaintAnims((int) bird.getPosX(), (int) bird.getPosY(), birds, g2, 0, -1);
+        else 
+            bird_anim.PaintAnims((int) bird.getPosX(), (int) bird.getPosY(), birds, g2, 0, 0);
+        
+        
+        
+        if(CurrentScreen == BEGIN_SCREEN){
+            g2.setColor(Color.red);
+            g2.drawString("Press space to play game", 200, 300);
+        }
+        if(CurrentScreen == GAMEOVER_SCREEN){
+            g2.setColor(Color.red);
+            g2.drawString("Press space to turn back begin screen", 200, 300);
+        }
+        
+        g2.setColor(Color.red);
+        g2.drawString("Point: "+Point, 20, 50);
     }
-
+    
+    @Override
     public void KEY_ACTION(KeyEvent e, int Event) {
+        if(Event == KEY_PRESSED){
+            
+            if(CurrentScreen == BEGIN_SCREEN){
+                
+                CurrentScreen = GAMEPLAY_SCREEN;
+                
+            }else if(CurrentScreen == GAMEPLAY_SCREEN){
+                if(bird.getLive()) bird.fly();
+            }else if(CurrentScreen == GAMEOVER_SCREEN){
+                CurrentScreen = BEGIN_SCREEN;
+            }
+        }
     }
+    
 }
 
 
